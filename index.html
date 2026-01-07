@@ -1,0 +1,289 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Tickys Market</title>
+
+<!-- FAVICON -->
+<link rel="icon" href="favicon.ico" type="image/x-icon">
+
+<style>
+:root{
+  --bg:#050505;
+  --panel:#0a0a0a;
+  --row:#0d0d0d;
+  --border:rgba(255,255,255,.08);
+  --text:#f1f1f1;
+  --muted:#9a9a9a;
+}
+
+*{box-sizing:border-box}
+html,body{height:100%}
+
+body{
+  margin:0;
+  background:var(--bg);
+  font-family: Inter, system-ui, sans-serif;
+  color:var(--text);
+  overflow:hidden;
+}
+
+/* dynamic background */
+canvas{
+  position:fixed;
+  inset:0;
+  z-index:0;
+}
+
+/* welcome box */
+.welcome{
+  position:fixed;
+  left:120px;
+  top:50%;
+  transform:translateY(-50%);
+  z-index:1;
+
+  padding:16px 22px;
+  border:1px solid rgba(255,255,255,.6);
+  border-radius:14px;
+
+  font-size:42px;
+  font-weight:700;
+  color:#fff;
+  letter-spacing:.02em;
+
+  background:rgba(0,0,0,.15);
+
+  text-shadow:
+    0 0 10px rgba(255,255,255,.3),
+    0 0 22px rgba(255,255,255,.2);
+
+  white-space:nowrap;
+}
+
+/* layout */
+.wrap{
+  position:relative;
+  z-index:1;
+  height:100%;
+  display:grid;
+  place-items:center;
+}
+
+.stack{
+  display:flex;
+  flex-direction:column;
+  gap:14px;
+}
+
+/* panels */
+.panel{
+  width:420px;
+  background:rgba(0,0,0,.55);
+  border:1px solid var(--border);
+  border-radius:18px;
+  padding:18px;
+  backdrop-filter: blur(10px);
+}
+
+.title{
+  text-align:center;
+  font-size:13px;
+  letter-spacing:.32em;
+  color:var(--muted);
+  margin-bottom:14px;
+}
+
+/* stock list */
+.stock{
+  max-height:380px;
+  overflow-y:auto;
+  padding-right:4px;
+}
+
+.stock::-webkit-scrollbar{
+  width:4px;
+}
+.stock::-webkit-scrollbar-thumb{
+  background:rgba(255,255,255,.25);
+  border-radius:4px;
+}
+
+/* rows */
+.row{
+  display:grid;
+  gap:12px;
+  align-items:center;
+  padding:12px 14px;
+  margin-bottom:8px;
+  background:var(--row);
+  border:1px solid var(--border);
+  border-radius:12px;
+}
+
+.row.market{
+  grid-template-columns:auto 80px;
+}
+
+.row.link{
+  grid-template-columns:130px auto;
+}
+
+.name{font-size:16px}
+.price{text-align:right;font-size:15px}
+.price small{display:block;font-size:12px;color:var(--muted)}
+
+.key{font-size:13px;color:var(--muted)}
+.value a,
+.value{font-size:14px;color:var(--text);text-decoration:none}
+.value a:hover{text-decoration:underline}
+
+/* payment note */
+.payment{
+  margin-top:10px;
+  padding-top:10px;
+  border-top:1px solid rgba(255,255,255,.08);
+  text-align:center;
+  font-size:12px;
+  color:var(--muted);
+}
+
+/* responsive */
+@media (max-width:900px){
+  .welcome{display:none;}
+  .panel{width:92vw;}
+}
+</style>
+</head>
+
+<body>
+
+<canvas id="web"></canvas>
+
+<div class="welcome">Welcome to Tickys Market</div>
+
+<div class="wrap">
+  <div class="stack">
+
+    <!-- USERNAMES -->
+    <div class="panel">
+      <div class="title">TIKTOK USERNAMES</div>
+      <div class="stock" id="stock"></div>
+    </div>
+
+    <!-- CONTACTS -->
+    <div class="panel">
+      <div class="title">PURCHASE & LINKS</div>
+
+      <div class="row link">
+        <div class="key">Telegram</div>
+        <div class="value">
+          <a href="https://t.me/tickyv" target="_blank">tickyv</a>
+        </div>
+      </div>
+
+      <div class="row link">
+        <div class="key">Market</div>
+        <div class="value">
+          <a href="https://t.me/TickysMarket" target="_blank">Tickys Market</a>
+        </div>
+      </div>
+
+      <div class="row link">
+        <div class="key">Discord</div>
+        <div class="value">@ticky</div>
+      </div>
+
+      <div class="row link">
+        <div class="key">OGU</div>
+        <div class="value">
+          <a href="https://oguser.com/member.php?action=profile&uid=1144734" target="_blank">
+            ticky
+          </a>
+        </div>
+      </div>
+
+      <div class="payment">
+        Payment methods: BTC / ETH and more supported
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script>
+/* ===== EDIT YOUR STOCK HERE ===== */
+const usernames = [
+  { name: "@postage", price: "$130", note: "C/O $100" },
+  { name: "@snuffled", price: "$25", note: "C/O $15" },
+  { name: "@insurant", price: "$15" },
+  { name: "@enduros", price: "$40" },
+  { name: "@sinkers", price: "$30" },
+  { name: "@ll84", price: "$7" },
+];
+
+/* render stock */
+const stock = document.getElementById("stock");
+usernames.forEach(u=>{
+  const row=document.createElement("div");
+  row.className="row market";
+  row.innerHTML=`
+    <div class="name">${u.name}</div>
+    <div class="price">${u.price}${u.note?`<small>${u.note}</small>`:""}</div>
+  `;
+  stock.appendChild(row);
+});
+
+/* brighter dynamic background */
+const canvas=document.getElementById("web");
+const ctx=canvas.getContext("2d");
+let w,h;
+
+function resize(){
+  w=canvas.width=window.innerWidth;
+  h=canvas.height=window.innerHeight;
+}
+window.addEventListener("resize",resize);
+resize();
+
+const points=Array.from({length:100},()=>({
+  x:Math.random()*w,
+  y:Math.random()*h,
+  vx:(Math.random()-.5)*0.4,
+  vy:(Math.random()-.5)*0.4
+}));
+
+function animate(){
+  ctx.clearRect(0,0,w,h);
+
+  for(const p of points){
+    p.x+=p.vx;
+    p.y+=p.vy;
+    if(p.x<0||p.x>w) p.vx*=-1;
+    if(p.y<0||p.y>h) p.vy*=-1;
+  }
+
+  for(let i=0;i<points.length;i++){
+    for(let j=i+1;j<points.length;j++){
+      const dx=points[i].x-points[j].x;
+      const dy=points[i].y-points[j].y;
+      const d=Math.sqrt(dx*dx+dy*dy);
+      if(d<170){
+        ctx.strokeStyle=`rgba(255,255,255,${(1-d/170)*0.4})`;
+        ctx.lineWidth=0.9;
+        ctx.beginPath();
+        ctx.moveTo(points[i].x,points[i].y);
+        ctx.lineTo(points[j].x,points[j].y);
+        ctx.stroke();
+      }
+    }
+  }
+
+  requestAnimationFrame(animate);
+}
+animate();
+</script>
+
+</body>
+</html>
